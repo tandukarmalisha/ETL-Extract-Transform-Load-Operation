@@ -1,0 +1,16 @@
+# Ignore the database password if it's in a config file
+config.py
+.env
+venv/
+
+# Ignore all Excel files so you don't leak data
+*.xlsx
+*.csv
+
+# Ignore logs and error reports
+*.log
+user_error_report.txt
+
+# Ignore Python "trash" files
+__pycache__/
+.DS_Store
