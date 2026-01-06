@@ -44,6 +44,17 @@ def clean_mobile(mobile_val: Any) -> str:
         raise ValueError(f"Mobile number too short: {digits}")
     return digits[-10:]
 
+# def clean_mobile(mobile_val: Any) -> str:
+#     """Standardizes mobile number to exactly 10 digits."""
+#     # 1. Strip all non-numeric characters
+#     digits: str = re.sub(r'\D', '', str(mobile_val))
+    
+#     # 2. Strict validation: Must be exactly 10
+#     if len(digits) != 10:
+#         raise ValueError(f"Mobile number must be exactly 10 digits. Found: {len(digits)}")
+    
+#     return digits
+
 def split_email_data(email_val: Any) -> Tuple[str, str]:
     """Splits email into username and domain."""
     email_clean: str = str(email_val).strip().lower() # Requirement: all small
