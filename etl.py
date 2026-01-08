@@ -171,7 +171,7 @@ def start_import():
         print("\n" + "="*40)
         print("          FINAL IMPORT REPORT")
         print("="*40)
-        print(f"✅ Success: {len(batch_data)} rows saved.")
+        print(f"✅ Success: {total_inserted} rows saved.")
         print(f"❌ Failed:  {len(user_error_report)} rows skipped.")
         
         if user_error_report:
