@@ -7,7 +7,6 @@ def format_name(name_val: Any) -> Optional[str]:
     name_str: str = str(name_val).strip()
     if not name_str or name_str.lower() == 'nan':
         return None
-    
     capitalized: str = " ".join([word.capitalize() for word in name_str.split()])
     return capitalized[:250]
 

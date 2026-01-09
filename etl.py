@@ -7,7 +7,16 @@ from database import get_db_engine  # Updated import
 from reporting import generate_final_report
 
 # ... (Logging setup stays exactly the same) ...
+# Logging Setup
 
+logging.basicConfig(
+level=logging.INFO,
+format='%(asctime)s - %(levelname)s - %(message)s',
+handlers=[
+logging.FileHandler("import_log.log"),
+logging.StreamHandler(sys.stdout)
+]
+)
 def start_import():
     # 1. Path Handling (Stay the same)
     if len(sys.argv) < 2:
@@ -53,7 +62,7 @@ def start_import():
             except Exception as e:
                 user_error_report.append(f"Row {row_no}: {str(e)}")
 
-        # 4. Use the Built-in Pandas method (The Supervisor's Request)
+        # 4. Use the Built-in Pandas method
         total_inserted = 0
         if cleaned_rows:
             # Create a new DataFrame from our cleaned data
