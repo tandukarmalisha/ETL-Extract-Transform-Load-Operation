@@ -1,5 +1,5 @@
 import unittest
-from etl import format_name, split_email_data, clean_mobile
+from main import format_name, split_email_data, clean_mobile
 
 class TestLogic(unittest.TestCase):
     def test_name_formatting(self):
