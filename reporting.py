@@ -1,6 +1,6 @@
 import os
 
-def generate_final_report(total_inserted: int, user_error_report: list):
+def generate_final_report(total_inserted: int, user_error_report: list, duration: float):
     """Prints a summary to the console and saves errors to a file."""
     
     # 1. Console Output
@@ -9,6 +9,8 @@ def generate_final_report(total_inserted: int, user_error_report: list):
     print("="*40)
     print(f"✅ Success: {total_inserted} rows saved.")
     print(f"❌ Failed:  {len(user_error_report)} rows skipped.")
+    print(f"⏱️ Time Taken: {duration:.2f} seconds")
+    print("="*40)
     
     # 2. Handle Error File Generation
     if user_error_report:
@@ -24,5 +26,9 @@ def generate_final_report(total_inserted: int, user_error_report: list):
             print("Please check this file to fix your Excel data.")
         except Exception as e:
             print(f"❌ Could not save error report file: {e}")
+            
+        # def generate_final_report(total_inserted, user_error_report, duration):
+    # ... existing report code ...
+       
             
     print("="*40)

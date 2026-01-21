@@ -2,25 +2,30 @@ import pandas as pd
 import logging
 import sys
 import os
+import time
 from logic import format_name, clean_mobile, split_email_data
-from database import get_db_engine  # Updated import
+from database import get_db_engine
 from reporting import generate_final_report
 
-# ... (Logging setup stays exactly the same) ...
 # Logging Setup
-
 logging.basicConfig(
-level=logging.INFO,
-format='%(asctime)s - %(levelname)s - %(message)s',
-handlers=[
-logging.FileHandler("import_log.log"),
-logging.StreamHandler(sys.stdout)
-]
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler("import_log.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
 )
+
 def start_import():
-    # 1. Path Handling (Stay the same)
+    start_time = time.time()  # Record start
+    duration = 0.0            # Initialize default value
+    total_inserted = 0
+    user_error_report = []
+
+    # 1. Path Handling
     if len(sys.argv) < 2:
-        logging.error("Usage: python3 etl.py <filename.xlsx>")
+        logging.error("Usage: python3 main.py <filename.xlsx>")
         return
 
     file_name = sys.argv[1]
@@ -30,16 +35,14 @@ def start_import():
         logging.error(f"File not found: {full_path}")
         return
 
-    user_error_report = []
-    cleaned_rows = [] # We store dictionaries here to build a new DF
-
     try:
         # 2. Load File
         df = pd.read_excel(full_path)
         df.columns = [str(c).strip().lower() for c in df.columns]
         logging.info(f"File loaded. Processing {len(df)} rows...")
 
-        # 3. Processing Loop (Logic Layer)
+        # 3. Processing Loop
+        cleaned_rows = []
         for index, row in df.iterrows():
             row_no = index + 2
             try:
@@ -50,7 +53,6 @@ def start_import():
                 mob_final = clean_mobile(row.get('mobile number'))
                 user_name, domain_name = split_email_data(row.get('email'))
 
-                # Collect into a list of dictionaries
                 cleaned_rows.append({
                     "name": name_final,
                     "address": addr_final,
@@ -58,30 +60,29 @@ def start_import():
                     "email": user_name,
                     "domain": domain_name
                 })
-
             except Exception as e:
                 user_error_report.append(f"Row {row_no}: {str(e)}")
 
-        # 4. Use the Built-in Pandas method
-        total_inserted = 0
+        # 4. Built-in Pandas method (to_sql)
         if cleaned_rows:
-            # Create a new DataFrame from our cleaned data
             df_final = pd.DataFrame(cleaned_rows)
-            
             engine = get_db_engine()
-            
-            # This is the built-in function that performs the query automatically
             df_final.to_sql(
                 name='etl_import', 
                 con=engine, 
                 if_exists='append', 
                 index=False, 
-                chunksize=1000 # This is the built-in batching!
+                chunksize=1000 
             )
             total_inserted = len(df_final)
 
-        # 5. Final Report
-        generate_final_report(total_inserted, user_error_report)
+        # 5. Calculate Duration BEFORE generating report
+        end_time = time.time()
+        duration = end_time - start_time
+        logging.info(f"⏱️ Process finished in {duration:.2f} seconds")
+
+        # 6. Final Report
+        generate_final_report(total_inserted, user_error_report, duration)
 
     except Exception as main_err:
         logging.critical(f"Critical System Failure: {main_err}")
